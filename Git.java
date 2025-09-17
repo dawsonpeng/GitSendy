@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -10,9 +12,14 @@ public class Git {
         File objects = new File("git", "objects");
         File index = new File("git", "index");
 
+        if(git.exists() && objects.exists() && index.exists()) {
+            System.out.println("Git repo already exists dawg 🥀");
+            return;
+        }
+
         if(!git.exists()) {
             git.mkdir();
-        } else System.out.println("git already exists dawg🥀");
+        }
 
         if(!objects.exists()) {
             objects.mkdir();
@@ -45,10 +52,29 @@ public class Git {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         byte[] messageDigest = md.digest(text.getBytes());
         BigInteger no = new BigInteger(1, messageDigest);
-        String hashtext = no.toString(16);
-        while (hashtext.length() < 40) {
-            hashtext = "0" + hashtext;
+        String hashText = no.toString(16);
+        while (hashText.length() < 40) {
+            hashText = "0" + hashText;
         }
-        return hashtext;
+        return hashText;
     }
+
+    public static void addIndex(String fileName, String hashText) throws IOException {
+        FileWriter writer = new FileWriter("index");
+        writer.write("\n" + hashText + " " + fileName);
+    }
+
+    public static void createBlob(String fileName) throws IOException, NoSuchAlgorithmException {
+        FileReader reader = new FileReader(fileName);
+        String content = "";
+        while(reader.ready()) {
+            content += reader.read();
+        }
+        String hashed = hash(content);
+        File blob = new File("objects", "hashed");
+        FileWriter writer = new FileWriter("hashed");
+        writer.write(content);
+        addIndex(fileName, hashed);
+    }
+
 }
