@@ -60,21 +60,27 @@ public class Git {
     }
 
     public static void addIndex(String fileName, String hashText) throws IOException {
-        FileWriter writer = new FileWriter("index");
+        FileWriter writer = new FileWriter("git/index", true);
         writer.write("\n" + hashText + " " + fileName);
+        writer.close();
     }
 
     public static void createBlob(String fileName) throws IOException, NoSuchAlgorithmException {
         FileReader reader = new FileReader(fileName);
         String content = "";
         while(reader.ready()) {
-            content += reader.read();
+            content += (char)reader.read();
         }
+        reader.close();
         String hashed = hash(content);
-        File blob = new File("objects", "hashed");
-        FileWriter writer = new FileWriter("hashed");
+        File blob = new File("git/objects", hashed);
+        if(!blob.exists()) {
+            blob.createNewFile();
+        }
+        FileWriter writer = new FileWriter("git/objects/" + hashed, true);
         writer.write(content);
         addIndex(fileName, hashed);
+        writer.close();
     }
 
 }
