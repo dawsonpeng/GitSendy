@@ -30,20 +30,20 @@ public class Git {
         }
     }
 
+    public static void deleteDirectory(File file)
+    {
+        for (File subfile : file.listFiles()) {
+            if (subfile.isDirectory()) {
+                deleteDirectory(subfile);
+            }
+            subfile.delete();
+        }
+    }
+
     public static void rmRepo() {
-        File objects = new File("git", "objects");
-        File index = new File("git", "index");
         File git = new File("git");
-
-        if(objects.exists()) {
-            objects.delete();
-        }
-
-        if(index.exists()) {
-            index.delete();
-        }
-
         if(git.exists()) {
+            deleteDirectory(git);
             git.delete();
         }
     }
@@ -74,13 +74,18 @@ public class Git {
         reader.close();
         String hashed = hash(content);
         File blob = new File("git/objects", hashed);
-        if(!blob.exists()) {
-            blob.createNewFile();
+        if(blob.exists()) {
+            return;
         }
+        blob.createNewFile();
         FileWriter writer = new FileWriter("git/objects/" + hashed, true);
         writer.write(content);
         addIndex(fileName, hashed);
         writer.close();
+    }
+
+    public static void resetTest() {
+
     }
 
 }
