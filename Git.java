@@ -40,7 +40,12 @@ public class Git {
             deleteDir(git);
             git.delete();
             System.out.println("git repo successfully deleted :o");
-        } else System.out.println("git repo doesnt exist brother- take some schizo meds");
+        } else System.out.println("git repo doesnt exist- take some schizo meds");
+    }
+
+    public static void resetRepo() throws IOException {
+        rmRepo();
+        initRepo();
     }
 
     public static String hash(String text) throws NoSuchAlgorithmException {
@@ -56,7 +61,11 @@ public class Git {
 
     public static void addIndex(String fileName, String hashText) throws IOException {
         FileWriter writer = new FileWriter("git/index", true);
-        writer.write("\n" + hashText + " " + fileName);
+        FileReader reader = new FileReader("git/index");
+        if(!reader.ready()) {
+            writer.write(hashText + " " + fileName);
+        } else writer.write("\n" + hashText + " " + fileName);
+        reader.close();
         writer.close();
     }
 
@@ -77,6 +86,7 @@ public class Git {
         writer.write(content);
         addIndex(fileName, hashed);
         writer.close();
+        System.out.println("BLOB file succesfully created yay");
     }
 
     public static void createTestFiles() throws IOException {

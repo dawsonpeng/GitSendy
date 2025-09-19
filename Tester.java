@@ -6,6 +6,11 @@ public class Tester {
         // Git.createTestFiles();
         // Git.rmRepo();
         // Git.initRepo();
-        // Git.createBlob("file.txt");
+        Git.resetRepo();
+        Git.createBlob("f1.txt");
+        Git.createBlob("f2.txt");
+        Git.createBlob("f3.txt");
+        Git.createBlob("f4.txt");
+        Git.createBlob("f5.txt");
     }
 }
