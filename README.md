@@ -9,7 +9,4 @@ rmRepo()- removes git folder with objects index and HEAD
 hash(String input)- hashes the input- got online
 addIndex(String fileName, String hashText)- writes the parameters in the index file
 createBlob(String fileName)- creates blob file, copies file, hashes contents, create new file in objects, writes the file into index
-<<<<<<< HEAD
-createTestFiles()- creates 5 test files with things inside them
-=======
->>>>>>> origin/main
+createTestFiles()- creates 5 test files with stuff in them
