@@ -11,30 +11,24 @@ public class Git {
         File git = new File("git");
         File objects = new File("git", "objects");
         File index = new File("git", "index");
+        File HEAD = new File("git", "HEAD");
 
         if(git.exists() && objects.exists() && index.exists()) {
-            System.out.println("Git repo already exists dawg 🥀");
+            System.out.println("git repo already exists dawg 🥀");
             return;
         }
-
-        if(!git.exists()) {
-            git.mkdir();
-        }
-
-        if(!objects.exists()) {
-            objects.mkdir();
-        }
-
-        if(!index.exists()) {
-            index.createNewFile();
-        }
+        if(!git.exists()) {git.mkdir();}
+        if(!objects.exists()) {objects.mkdir();}
+        if(!index.exists()) {index.createNewFile();}
+        if(!HEAD.exists()) {HEAD.createNewFile();}
+        System.out.println("git repo successfully made :o");
     }
 
-    public static void deleteDirectory(File file)
+    public static void deleteDir(File file)
     {
         for (File subfile : file.listFiles()) {
             if (subfile.isDirectory()) {
-                deleteDirectory(subfile);
+                deleteDir(subfile);
             }
             subfile.delete();
         }
@@ -43,9 +37,10 @@ public class Git {
     public static void rmRepo() {
         File git = new File("git");
         if(git.exists()) {
-            deleteDirectory(git);
+            deleteDir(git);
             git.delete();
-        }
+            System.out.println("git repo successfully deleted :o");
+        } else System.out.println("git repo doesnt exist brother- take some schizo meds");
     }
 
     public static String hash(String text) throws NoSuchAlgorithmException {
@@ -84,8 +79,32 @@ public class Git {
         writer.close();
     }
 
-    public static void resetTest() {
-
+    public static void createTestFiles() throws IOException {
+        File f1 = new File("f1.txt");
+        File f2 = new File("f2.txt");
+        File f3 = new File("f3.txt");
+        File f4 = new File("f4.txt");  
+        File f5 = new File("f5.txt");
+        f1.createNewFile();
+        f2.createNewFile();
+        f3.createNewFile();
+        f4.createNewFile();
+        f5.createNewFile();
+        FileWriter writer1 = new FileWriter(f1);
+        writer1.write("67");
+        writer1.close();
+        FileWriter writer2 = new FileWriter(f2);
+        writer2.write("hellobodorpbadinga");
+        writer2.close();
+        FileWriter writer3 = new FileWriter(f3);
+        writer3.write("finormanascheiss");
+        writer3.close();
+        FileWriter writer4 = new FileWriter(f4);
+        writer4.write("bazingagahook");
+        writer4.close();
+        FileWriter writer5 = new FileWriter(f5);
+        writer5.write("sam and dawson is awesome(amazing grammar)");
+        writer5.close();
     }
 
 }

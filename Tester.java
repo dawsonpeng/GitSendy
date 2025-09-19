@@ -3,8 +3,9 @@ import java.security.NoSuchAlgorithmException;
 
 public class Tester {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+        
         // Git.rmRepo();
-        Git.initRepo();
+        // Git.initRepo();
         // Git.createBlob("file.txt");
     }
 }
