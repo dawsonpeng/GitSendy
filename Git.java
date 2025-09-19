@@ -11,30 +11,24 @@ public class Git {
         File git = new File("git");
         File objects = new File("git", "objects");
         File index = new File("git", "index");
+        File HEAD = new File("git", "HEAD");
 
         if(git.exists() && objects.exists() && index.exists()) {
-            System.out.println("Git repo already exists dawg 🥀");
+            System.out.println("git repo already exists dawg 🥀");
             return;
         }
-
-        if(!git.exists()) {
-            git.mkdir();
-        }
-
-        if(!objects.exists()) {
-            objects.mkdir();
-        }
-
-        if(!index.exists()) {
-            index.createNewFile();
-        }
+        if(!git.exists()) {git.mkdir();}
+        if(!objects.exists()) {objects.mkdir();}
+        if(!index.exists()) {index.createNewFile();}
+        if(!HEAD.exists()) {HEAD.createNewFile();}
+        System.out.println("git repo successfully made :o");
     }
 
-    public static void deleteDirectory(File file)
+    public static void deleteDir(File file)
     {
         for (File subfile : file.listFiles()) {
             if (subfile.isDirectory()) {
-                deleteDirectory(subfile);
+                deleteDir(subfile);
             }
             subfile.delete();
         }
@@ -43,9 +37,10 @@ public class Git {
     public static void rmRepo() {
         File git = new File("git");
         if(git.exists()) {
-            deleteDirectory(git);
+            deleteDir(git);
             git.delete();
-        }
+            System.out.println("git repo successfully deleted :o");
+        } else System.out.println("git repo doesnt exist brother- take some schizo meds");
     }
 
     public static String hash(String text) throws NoSuchAlgorithmException {
