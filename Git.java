@@ -3,6 +3,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -69,13 +71,18 @@ public class Git {
         writer.close();
     }
 
-    public static void createBlob(String fileName) throws IOException, NoSuchAlgorithmException {
+    public static String getContent(String fileName) throws IOException {
         FileReader reader = new FileReader(fileName);
         String content = "";
         while(reader.ready()) {
             content += (char)reader.read();
         }
         reader.close();
+        return content;
+    }
+
+    public static void createBlob(String fileName) throws IOException, NoSuchAlgorithmException {
+        String content = getContent(fileName);
         String hashed = hash(content);
         File blob = new File("git/objects", hashed);
         if(blob.exists()) {
@@ -115,6 +122,18 @@ public class Git {
         FileWriter writer5 = new FileWriter(f5);
         writer5.write("sam and dawson is awesome(amazing grammar)");
         writer5.close();
+    }
+
+    public static void checkBlobExists(String fileName) throws IOException, NoSuchAlgorithmException {
+        File blob = new File("git/objects/" + hash(getContent(fileName)));
+        if(blob.exists()) {
+            String indexContents = Files.readString(Path.of("git/index"));
+            if (indexContents.contains(fileName)) {
+                System.out.println("blob exists - good job");
+                return;
+            }
+        }
+        System.out.println("blob doesnt exist lol");
     }
 
 }
