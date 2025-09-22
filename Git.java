@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.annotation.processing.Filer;
+
 public class Git {
     public static void initRepo() throws IOException {
         File git = new File("git");
@@ -28,6 +30,9 @@ public class Git {
 
     public static void deleteDir(File file)
     {
+        if(file == null) {
+            return;
+        }
         for (File subfile : file.listFiles()) {
             if (subfile.isDirectory()) {
                 deleteDir(subfile);
@@ -62,37 +67,37 @@ public class Git {
     }
 
     public static void addIndex(String fileName, String hashText) throws IOException {
-        FileWriter writer = new FileWriter("git/index", true);
-        FileReader reader = new FileReader("git/index");
-        if(!reader.ready()) {
-            writer.write(hashText + " " + fileName);
-        } else writer.write("\n" + hashText + " " + fileName);
-        reader.close();
-        writer.close();
+    File index = new File("git/index");
+    FileWriter writer = new FileWriter(index, true);
+    if (index.length() == 0) {
+        writer.write(hashText + " " + fileName);
+    } else {
+        writer.write("\n" + hashText + " " + fileName);
+    }
+    writer.close();
     }
 
     public static String getContent(String fileName) throws IOException {
         FileReader reader = new FileReader(fileName);
-        String content = "";
-        while(reader.ready()) {
-            content += (char)reader.read();
-        }
-        reader.close();
-        return content;
+    StringBuilder content = new StringBuilder();
+    int ch;
+    while ((ch = reader.read()) != -1) {
+        content.append((char) ch);
+    }
+    return content.toString();
     }
 
     public static void createBlob(String fileName) throws IOException, NoSuchAlgorithmException {
         String content = getContent(fileName);
         String hashed = hash(content);
         File blob = new File("git/objects", hashed);
-        if(blob.exists()) {
-            return;
+        if (!blob.exists()) {
+            blob.createNewFile();
+            FileWriter writer = new FileWriter(blob);
+            writer.write(content);
+            writer.close();
         }
-        blob.createNewFile();
-        FileWriter writer = new FileWriter("git/objects/" + hashed, true);
-        writer.write(content);
         addIndex(fileName, hashed);
-        writer.close();
         System.out.println("BLOB file succesfully created yay");
     }
 

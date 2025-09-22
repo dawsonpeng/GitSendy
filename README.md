@@ -9,7 +9,7 @@ deleteDir(File file)- deletes the objects in the file/directory- got online
 
 rmRepo()- removes git folder with objects index and HEAD
 
-resetRepo()= deletes and recreates empty repo files
+resetRepo()= deletes and recreates empty repo files, effective for testing
 
 hash(String input)- hashes the input- got online
 
