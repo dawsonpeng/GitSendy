@@ -22,3 +22,5 @@ createBlob(String fileName)- creates blob file, copies file, hashes contents, cr
 createTestFiles()- creates 5 test files with things inside them
 
 checkBlobExists(String filename)- checks if blob exists in objects and index
+
+compression(boolean e)- enables/disables compression
