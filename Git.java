@@ -65,7 +65,7 @@ public class Git {
         initRepo();
     }
 
-    public static String hash(String text) throws NoSuchAlgorithmException {
+    public static String hash(String text) throws NoSuchAlgorithmException { //got online, https://www.geeksforgeeks.org/java/sha-1-hash-in-java/ 
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         byte[] messageDigest = md.digest(text.getBytes());
         BigInteger no = new BigInteger(1, messageDigest);
@@ -98,7 +98,7 @@ public class Git {
         return content.toString();
     }
 
-    private static void zipFile(String filePath) {
+    private static void zipFile(String filePath) { //got from online, https://www.codejava.net/java-se/file-io/how-to-compress-files-in-zip-format-in-java
         try {
             File file = new File(filePath);
             String zipFileName = file.getName().concat(".zip");
