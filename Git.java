@@ -1,16 +1,26 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import javax.annotation.processing.Filer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Git {
+    static boolean compression = false;
+
+    public static void compression(boolean e) {
+        compression = e;
+        System.out.println("compression = " + e);
+    }
+
     public static void initRepo() throws IOException {
         File git = new File("git");
         File objects = new File("git", "objects");
@@ -55,7 +65,7 @@ public class Git {
         initRepo();
     }
 
-    public static String hash(String text) throws NoSuchAlgorithmException {
+    public static String hash(String text) throws NoSuchAlgorithmException { //got online, https://www.geeksforgeeks.org/java/sha-1-hash-in-java/ 
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         byte[] messageDigest = md.digest(text.getBytes());
         BigInteger no = new BigInteger(1, messageDigest);
@@ -79,16 +89,43 @@ public class Git {
 
     public static String getContent(String fileName) throws IOException {
         FileReader reader = new FileReader(fileName);
-    StringBuilder content = new StringBuilder();
-    int ch;
-    while ((ch = reader.read()) != -1) {
-        content.append((char) ch);
+        StringBuilder content = new StringBuilder();
+        int ch;
+        while ((ch = reader.read()) != -1) {
+            content.append((char) ch);
+        }
+        reader.close();
+        return content.toString();
     }
-    return content.toString();
+
+    private static void zipFile(String filePath) { //got from online, https://www.codejava.net/java-se/file-io/how-to-compress-files-in-zip-format-in-java
+        try {
+            File file = new File(filePath);
+            String zipFileName = file.getName().concat(".zip");
+ 
+            FileOutputStream fos = new FileOutputStream(zipFileName);
+            ZipOutputStream zos = new ZipOutputStream(fos);
+ 
+            zos.putNextEntry(new ZipEntry(file.getName()));
+ 
+            byte[] bytes = Files.readAllBytes(Paths.get(filePath));
+            zos.write(bytes, 0, bytes.length);
+            zos.closeEntry();
+            zos.close();
+ 
+        } catch (FileNotFoundException ex) {
+            System.err.format("The file %s does not exist", filePath);
+        } catch (IOException ex) {
+            System.err.println("I/O error: " + ex);
+        }
     }
 
     public static void createBlob(String fileName) throws IOException, NoSuchAlgorithmException {
-        String content = getContent(fileName);
+        String content;
+        if(compression) {
+            zipFile(fileName);
+            content = getContent(fileName + ".zip");
+        } else content = getContent(fileName);
         String hashed = hash(content);
         File blob = new File("git/objects", hashed);
         if (!blob.exists()) {

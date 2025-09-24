@@ -6,6 +6,7 @@ public class Tester {
         Git.createTestFiles();
         // Git.rmRepo();
         // Git.initRepo();
+        Git.compression(true);
         Git.resetRepo();
         Git.createBlob("f1.txt");
         Git.checkBlobExists("f1.txt");
