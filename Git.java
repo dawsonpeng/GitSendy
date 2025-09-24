@@ -167,7 +167,11 @@ public class Git {
     }
 
     public static void checkBlobExists(String fileName) throws IOException, NoSuchAlgorithmException {
-        File blob = new File("git/objects/" + hash(getContent(fileName)));
+        String hashedFile;
+        if(compression) {
+            hashedFile = hash(getContent(fileName + ".zip"));
+        } else hashedFile = hash(getContent(fileName));
+        File blob = new File("git/objects/" + hashedFile);
         if(blob.exists()) {
             String indexContents = Files.readString(Path.of("git/index"));
             if (indexContents.contains(fileName)) {
