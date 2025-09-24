@@ -18,6 +18,7 @@ public class Git {
 
     public static void compression(boolean e) {
         compression = e;
+        System.out.println("compression = " + e);
     }
 
     public static void initRepo() throws IOException {
