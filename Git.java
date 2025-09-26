@@ -134,7 +134,9 @@ public class Git {
             writer.write(content);
             writer.close();
         }
-        addIndex(fileName, hashed);
+        File file = new File(fileName);
+        String filePath = file.getAbsolutePath();
+        addIndex(filePath, hashed);
         System.out.println("BLOB file succesfully created yay");
     }
 
