@@ -49,13 +49,13 @@ public class Git {
             }
             subfile.delete();
         }
+        file.delete();
     }
 
     public static void rmRepo() {
         File git = new File("git");
         if(git.exists()) {
             deleteDir(git);
-            git.delete();
             System.out.println("git repo successfully deleted :o");
         } else System.out.println("git repo doesnt exist- take some schizo meds");
     }
@@ -76,19 +76,19 @@ public class Git {
         return hashText;
     }
 
-    public static void addIndex(String fileName, String hashText) throws IOException {
+    public static void addIndex(String filePath, String hashText) throws IOException {
     File index = new File("git/index");
     FileWriter writer = new FileWriter(index, true);
     if (index.length() == 0) {
-        writer.write(hashText + " " + fileName);
+        writer.write(hashText + " " + filePath);
     } else {
-        writer.write("\n" + hashText + " " + fileName);
+        writer.write("\n" + hashText + " " + filePath);
     }
     writer.close();
     }
 
-    public static String getContent(String fileName) throws IOException {
-        FileReader reader = new FileReader(fileName);
+    public static String getContent(String filePath) throws IOException {
+        FileReader reader = new FileReader(filePath);
         StringBuilder content = new StringBuilder();
         int ch;
         while ((ch = reader.read()) != -1) {
@@ -120,12 +120,12 @@ public class Git {
         }
     }
 
-    public static void createBlob(String fileName) throws IOException, NoSuchAlgorithmException {
+    public static void commitFile(String filePath) throws IOException, NoSuchAlgorithmException {
         String content;
         if(compression) {
-            zipFile(fileName);
-            content = getContent(fileName + ".zip");
-        } else content = getContent(fileName);
+            zipFile(filePath);
+            content = getContent(filePath + ".zip");
+        } else content = getContent(filePath);
         String hashed = hash(content);
         File blob = new File("git/objects", hashed);
         if (!blob.exists()) {
@@ -134,18 +134,18 @@ public class Git {
             writer.write(content);
             writer.close();
         }
-        File file = new File(fileName);
-        String filePath = file.getAbsolutePath();
         addIndex(filePath, hashed);
         System.out.println("BLOB file succesfully created yay");
     }
 
     public static void createTestFiles() throws IOException {
-        File f1 = new File("f1.txt");
-        File f2 = new File("f2.txt");
-        File f3 = new File("f3.txt");
-        File f4 = new File("f4.txt");  
-        File f5 = new File("f5.txt");
+        File testFolder = new File("testFolder");
+        testFolder.mkdir();
+        File f1 = new File("testFiles/f1.txt");
+        File f2 = new File("testFiles/f2.txt");
+        File f3 = new File("testFiles/f3.txt");
+        File f4 = new File("testFiles/f4.txt");
+        File f5 = new File("testFiles/f5.txt");
         f1.createNewFile();
         f2.createNewFile();
         f3.createNewFile();
@@ -168,15 +168,20 @@ public class Git {
         writer5.close();
     }
 
-    public static void checkBlobExists(String fileName) throws IOException, NoSuchAlgorithmException {
+    public static void deleteTestFiles() {
+        File testFiles = new File("testFiles");
+        deleteDir(testFiles);
+    }
+
+    public static void checkBlobExists(String filePath) throws IOException, NoSuchAlgorithmException {
         String hashedFile;
         if(compression) {
-            hashedFile = hash(getContent(fileName + ".zip"));
-        } else hashedFile = hash(getContent(fileName));
+            hashedFile = hash(getContent(filePath + ".zip"));
+        } else hashedFile = hash(getContent(filePath));
         File blob = new File("git/objects/" + hashedFile);
         if(blob.exists()) {
             String indexContents = Files.readString(Path.of("git/index"));
-            if (indexContents.contains(fileName)) {
+            if (indexContents.contains(filePath)) {
                 System.out.println("blob exists - good job");
                 return;
             }
