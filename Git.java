@@ -139,7 +139,7 @@ public class Git {
     }
 
     public static void createTestFiles() throws IOException {
-        File testFolder = new File("testFolder");
+        File testFolder = new File("testFiles");
         testFolder.mkdir();
         File f1 = new File("testFiles/f1.txt");
         File f2 = new File("testFiles/f2.txt");
@@ -175,11 +175,12 @@ public class Git {
 
     public static void checkBlobExists(String filePath) throws IOException, NoSuchAlgorithmException {
         String hashedFile;
-        if(compression) {
+        if (compression) {
             hashedFile = hash(getContent(filePath + ".zip"));
-        } else hashedFile = hash(getContent(filePath));
+        } else
+            hashedFile = hash(getContent(filePath));
         File blob = new File("git/objects/" + hashedFile);
-        if(blob.exists()) {
+        if (blob.exists()) {
             String indexContents = Files.readString(Path.of("git/index"));
             if (indexContents.contains(filePath)) {
                 System.out.println("blob exists - good job");
@@ -187,6 +188,21 @@ public class Git {
             }
         }
         System.out.println("blob doesnt exist lol");
+    }
+    
+    public static void createBasicTree(String hash, String filePath) {
+        StringBuilder treeContents = new StringBuilder("");
+        treeContents.append("BLOB " + hash + " " + filePath.substring(filePath.indexOf("/") + 1));
+        try {
+            File tree = new File(hash(treeContents.toString()));
+            tree.createNewFile();
+            FileWriter writer = new FileWriter(tree);
+            writer.write(treeContents.toString());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

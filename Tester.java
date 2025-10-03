@@ -3,7 +3,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class Tester {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        // Git.createTestFiles();
+        Git.createTestFiles();
         // Git.rmRepo();
         // Git.initRepo();
         Git.compression(false);//compression doesnt work rn
