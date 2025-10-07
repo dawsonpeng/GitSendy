@@ -1,0 +1,45 @@
+public class IndexEntry implements Comparable<IndexEntry> {
+
+    private String filePath;
+    private String hash;
+    private boolean isBLOB;
+
+    public IndexEntry(String line) {
+        String[] lineContents = line.split(" ");
+        this.isBLOB = (lineContents[0]).equals("blob");
+        this.hash = lineContents[1];
+        this.filePath = lineContents[2];
+    }
+
+    public IndexEntry(String hash, String path) {
+        this.isBLOB = false;
+        this.hash = hash;
+        this.filePath = path;
+    }
+
+    public boolean isBLOB() {
+        return isBLOB;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public String getFolderPath() {
+        if (!filePath.contains("/"))
+            return "";
+        return filePath.substring(0, filePath.lastIndexOf("/"));
+    }
+
+    public int compareTo(IndexEntry otherIndexEntry) {
+        String[] brokenDownPathA = filePath.split("/");
+        String[] brokenDownPathB = otherIndexEntry.filePath.split("/");
+        if (brokenDownPathA.length != brokenDownPathB.length)
+            return Integer.compare(brokenDownPathB.length - 1, brokenDownPathA.length - 1);
+        return filePath.compareTo(otherIndexEntry.filePath);
+    }
+}
