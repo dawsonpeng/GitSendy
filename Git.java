@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.zip.ZipEntry;
@@ -193,19 +194,23 @@ public class Git {
         System.out.println("blob doesnt exist lol");
     }
     
-    public static void createBasicTree(String hash, String filePath) {
+    public static String createTree(ArrayList<IndexEntry> files) {
         StringBuilder treeContents = new StringBuilder("");
-        treeContents.append("BLOB " + hash + " " + filePath.substring(filePath.indexOf("/") + 1));
+        for (IndexEntry file : files) {
+            treeContents.append("BLOB " + file.getHash() + " " + file.getFilePath());
+        }
         try {
             File tree = new File(hash(treeContents.toString()));
             tree.createNewFile();
             FileWriter writer = new FileWriter(tree);
             writer.write(treeContents.toString());
+            return hash(treeContents.toString());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return "";
     }
 
     public static void createWorkingList() {
@@ -220,6 +225,28 @@ public class Git {
             e.printStackTrace();
         }
         // FIX ENTRY
-        // while (workingList.remove.)
+
+        ArrayList<IndexEntry> currTreeItems = new ArrayList<>();
+        IndexEntry currItem = workingList.remove();
+        String currFolder = currItem.getFolderPath();
+        String currTree = currFolder;
+
+        while (!workingList.isEmpty()) {
+            if (currFolder.equals("")) {
+                // normal blob it
+            } else if (currFolder.equals(currTree)) {
+                currTreeItems.add(currItem);
+            }
+            else {
+                String treeHash = createTree(currTreeItems);
+                workingList.add(new IndexEntry(treeHash, currFolder));
+                currTreeItems.clear();
+                currTreeItems.add(currItem);
+                currTree = currFolder;
+            }
+            currItem = workingList.remove();
+            currFolder = currItem.getFolderPath();
+        }
+
     }
 }
