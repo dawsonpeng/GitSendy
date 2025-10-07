@@ -12,12 +12,14 @@ public class IndexEntry implements Comparable<IndexEntry> {
     }
 
     public int compareTo(IndexEntry otherIndexEntry) {
-        return Integer.compare(countSlashes(filePath), countSlashes(otherIndexEntry.filePath));
-    }
-
-    public static int countSlashes(String string) {
-        if (string.indexOf("/") != -1)
-            return 1 + countSlashes(string.substring(string.indexOf("/") + 1));
+        String[] brokenDownPathA = filePath.split("/");
+        String[] brokenDownPathB = otherIndexEntry.filePath.split("/");
+        if (brokenDownPathA.length == brokenDownPathB.length)
+            return Integer.compare(brokenDownPathA.length - 1, brokenDownPathB.length - 1);
+        for (int i = 0; i < brokenDownPathA.length; i++) {
+            if (!brokenDownPathA[i].equals(brokenDownPathB[i]))
+                return brokenDownPathA[i].compareTo(brokenDownPathB[i]);
+        }
         return 0;
     }
 }
