@@ -11,13 +11,35 @@ public class IndexEntry implements Comparable<IndexEntry> {
         this.filePath = lineContents[2];
     }
 
-    public int compareTo(IndexEntry otherIndexEntry) {
-        return Integer.compare(countSlashes(filePath), countSlashes(otherIndexEntry.filePath));
+    public IndexEntry(String hash, String path) {
+        this.isBLOB = false;
+        this.hash = hash;
+        this.filePath = path;
     }
 
-    public static int countSlashes(String string) {
-        if (string.indexOf("/") != -1)
-            return 1 + countSlashes(string.substring(string.indexOf("/") + 1));
-        return 0;
+    public boolean isBLOB() {
+        return isBLOB;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public String getFolderPath() {
+        if (!filePath.contains("/"))
+            return "";
+        return filePath.substring(0, filePath.lastIndexOf("/"));
+    }
+
+    public int compareTo(IndexEntry otherIndexEntry) {
+        String[] brokenDownPathA = filePath.split("/");
+        String[] brokenDownPathB = otherIndexEntry.filePath.split("/");
+        if (brokenDownPathA.length != brokenDownPathB.length)
+            return Integer.compare(brokenDownPathB.length - 1, brokenDownPathA.length - 1);
+        return filePath.compareTo(otherIndexEntry.filePath);
     }
 }
