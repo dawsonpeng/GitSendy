@@ -219,5 +219,7 @@ public class Git {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // FIX ENTRY
+        // while (workingList.remove.)
     }
 }
