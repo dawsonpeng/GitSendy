@@ -84,9 +84,9 @@ public class Git {
         File index = new File("git/index");
         FileWriter writer = new FileWriter(index, true);
         if (index.length() == 0) {
-            writer.write("BLOB " + hashText + " " + filePath);
+            writer.write("blob " + hashText + " " + filePath);
         } else {
-            writer.write("\n" + "BLOB " + hashText + " " + filePath);
+            writer.write("\n" + "blob " + hashText + " " + filePath);
         }
         writer.close();
     }
@@ -101,9 +101,9 @@ public class Git {
         File index = new File("git/index");
         FileWriter writer = new FileWriter(index, true);
         if (index.length() == 0) {
-            writer.write("BLOB " + hashText + " " + filePath);
+            writer.write("blob " + hashText + " " + filePath);
         } else {
-            writer.write("\n" + "BLOB " + hashText + " " + filePath);
+            writer.write("\n" + "blob " + hashText + " " + filePath);
         }
         writer.close();
     }
@@ -239,7 +239,10 @@ public class Git {
         StringBuilder treeContents = new StringBuilder("");
         for (IndexEntry file : files) {
             String hash = BLOBFile(file);
-            treeContents.append("BLOB " + hash + " " + file.getFilePath() + "\n");
+            if (file.isBLOB())
+                treeContents.append("blob " + hash + " " + file.getFilePath() + "\n");
+            else
+                treeContents.append("tree " + hash + " " + file.getFilePath() + "\n");
         }
         String treeFileContents = treeContents.substring(0, treeContents.length() - 1);
         try {
@@ -276,9 +279,8 @@ public class Git {
             IndexEntry currItem = workingList.remove();
             String currFolder = currItem.getFolderPath();
 
-            if (currFolder.equals("")) {
+            if (currFolder.equals(""))
                 BLOBFile(currItem);
-            }
 
             currTreeItems.add(currItem);
 
