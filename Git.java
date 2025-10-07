@@ -141,7 +141,7 @@ public class Git {
         }
     }
 
-    public static void commitFile(String filePath) throws IOException, NoSuchAlgorithmException {
+    public static void createBlob(String filePath) throws IOException, NoSuchAlgorithmException {
         String content;
         if (compression) {
             zipFile(filePath);

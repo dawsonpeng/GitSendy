@@ -9,10 +9,10 @@ public class Tester {
         Git.compression(false);//compression doesnt work rn
         Git.resetRepo();
         
-        // Git.commitFile("testFiles/f1.txt");
-        // Git.commitFile("testFiles/f2.txt");
-        // Git.commitFile("testFiles/f3.txt");
-        // Git.commitFile("testFiles/f1.txt");
+        // Git.createBlob("testFiles/f1.txt");
+        // Git.createBlob("testFiles/f2.txt");
+        // Git.createBlob("testFiles/f3.txt");
+        // Git.createBlob("testFiles/f1.txt");
         // Git.checkBlobExists("testFiles/f1.txt");
         // Git.checkBlobExists("testFiles/f2.txt");
         // Git.checkBlobExists("testFiles/f3.txt");

@@ -17,7 +17,7 @@ getContent(String filePath)- gets the content of the file
 
 addIndex(String filePath, String hashText)- writes the parameters in the index file
 
-commitFile(String filePath)- creates blob file, copies file, hashes contents, create new file in objects, writes the file into index
+createBlob(String filePath)- creates blob file, copies file, hashes contents, create new file in objects, writes the file into index
 
 createTestFiles()- creates 5 test files with things inside them
 
