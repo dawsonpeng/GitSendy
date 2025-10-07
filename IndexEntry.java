@@ -6,7 +6,7 @@ public class IndexEntry implements Comparable<IndexEntry> {
 
     public IndexEntry(String line) {
         String[] lineContents = line.split(" ");
-        this.isBLOB = (lineContents[0]).equals("BLOB");
+        this.isBLOB = (lineContents[0]).equals("blob");
         this.hash = lineContents[1];
         this.filePath = lineContents[2];
     }

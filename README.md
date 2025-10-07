@@ -26,3 +26,17 @@ deleteTestFiles()- deletes everything in testFiles folder
 checkBlobExists(String filePath)- checks if blob exists in objects and index
 
 compression(boolean e)- enables/disables compression
+
+
+
+IndexEntry class stores all the info for a particular file / tree (hash + path) -> allows use of priority queue (can be initialized w/ either just a line from the index file -> always a blob or from a specified hash and path -> assumed tree bc items added back in recursively are always trees)
+
+addIndex(String filePath) -> added this method (same as above but diff params) to break apart the commit function bc it now needs to be done seperately
+
+BLOBFile(IndexEntry file) -> same thing done separately now (returns hash for convience)
+
+createTree(ArrayList<IndexEntry> files) -> builds a tree from all the index entries in that subfolder returns hash for convience
+
+buildTree() -> accesses index file and converts lines to priority queue of index entries. loops through, when the end of a subfolder is reached it builds that mini tree and then adds it to the working list, loops through until there are no more subfolders (you are at the root)
+
+
