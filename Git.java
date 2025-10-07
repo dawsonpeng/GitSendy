@@ -1,3 +1,4 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -10,6 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -205,4 +208,16 @@ public class Git {
         }
     }
 
+    public static void createWorkingList() {
+        PriorityQueue<IndexEntry> workingList = new PriorityQueue<IndexEntry>();
+        try (BufferedReader br = new BufferedReader(new FileReader("git/index"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                workingList.add(new IndexEntry(line));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
