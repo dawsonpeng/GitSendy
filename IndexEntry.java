@@ -17,6 +17,10 @@ public class IndexEntry implements Comparable<IndexEntry> {
         this.filePath = path;
     }
 
+    public boolean isBLOB() {
+        return isBLOB;
+    }
+
     public String getHash() {
         return hash;
     }
@@ -34,7 +38,7 @@ public class IndexEntry implements Comparable<IndexEntry> {
     public int compareTo(IndexEntry otherIndexEntry) {
         String[] brokenDownPathA = filePath.split("/");
         String[] brokenDownPathB = otherIndexEntry.filePath.split("/");
-        if (brokenDownPathA.length == brokenDownPathB.length)
+        if (brokenDownPathA.length != brokenDownPathB.length)
             return Integer.compare(brokenDownPathA.length - 1, brokenDownPathB.length - 1);
         for (int i = 0; i < brokenDownPathA.length; i++) {
             if (!brokenDownPathA[i].equals(brokenDownPathB[i]))

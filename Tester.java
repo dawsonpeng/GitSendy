@@ -8,12 +8,22 @@ public class Tester {
         // Git.initRepo();
         Git.compression(false);//compression doesnt work rn
         Git.resetRepo();
-        Git.commitFile("testFiles/f1.txt");
-        Git.commitFile("testFiles/f2.txt");
-        Git.commitFile("testFiles/f3.txt");
-        Git.commitFile("testFiles/f1.txt");
-        Git.checkBlobExists("testFiles/f1.txt");
-        Git.checkBlobExists("testFiles/f2.txt");
-        Git.checkBlobExists("testFiles/f3.txt");
+        
+        // Git.commitFile("testFiles/f1.txt");
+        // Git.commitFile("testFiles/f2.txt");
+        // Git.commitFile("testFiles/f3.txt");
+        // Git.commitFile("testFiles/f1.txt");
+        // Git.checkBlobExists("testFiles/f1.txt");
+        // Git.checkBlobExists("testFiles/f2.txt");
+        // Git.checkBlobExists("testFiles/f3.txt");
+
+        // ADD FILES TO INDEX
+        Git.addIndex("testFiles/f1.txt");
+        Git.addIndex("testFiles/f2.txt");
+        Git.addIndex("testFiles/f3.txt");
+        Git.addIndex("testFiles/f4.txt");
+        Git.addIndex("testFiles/f5.txt");
+
+        Git.buildTree();
     }
 }

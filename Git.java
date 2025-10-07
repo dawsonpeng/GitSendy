@@ -81,14 +81,31 @@ public class Git {
     }
 
     public static void addIndex(String filePath, String hashText) throws IOException {
-    File index = new File("git/index");
-    FileWriter writer = new FileWriter(index, true);
-    if (index.length() == 0) {
-        writer.write(hashText + " " + filePath);
-    } else {
-        writer.write("\n" + hashText + " " + filePath);
+        File index = new File("git/index");
+        FileWriter writer = new FileWriter(index, true);
+        if (index.length() == 0) {
+            writer.write("BLOB " + hashText + " " + filePath);
+        } else {
+            writer.write("\n" + "BLOB " + hashText + " " + filePath);
+        }
+        writer.close();
     }
-    writer.close();
+    
+    public static void addIndex(String filePath) throws IOException {
+        String hashText = "";
+        try {
+            hashText = hash(getContent(filePath));
+        } catch (NoSuchAlgorithmException | IOException e) {
+            e.printStackTrace();
+        }
+        File index = new File("git/index");
+        FileWriter writer = new FileWriter(index, true);
+        if (index.length() == 0) {
+            writer.write("BLOB " + hashText + " " + filePath);
+        } else {
+            writer.write("\n" + "BLOB " + hashText + " " + filePath);
+        }
+        writer.close();
     }
 
     public static String getContent(String filePath) throws IOException {
@@ -126,10 +143,11 @@ public class Git {
 
     public static void commitFile(String filePath) throws IOException, NoSuchAlgorithmException {
         String content;
-        if(compression) {
+        if (compression) {
             zipFile(filePath);
             content = getContent(filePath + ".zip");
-        } else content = getContent(filePath);
+        } else
+            content = getContent(filePath);
         String hashed = hash(content);
         File blob = new File("git/objects", hashed);
         if (!blob.exists()) {
@@ -140,6 +158,22 @@ public class Git {
         }
         addIndex(filePath, hashed);
         System.out.println("BLOB file succesfully created yay");
+    }
+    
+    public static String BLOBFile(IndexEntry file) throws IOException, NoSuchAlgorithmException {
+        String content;
+        if (!file.isBLOB())
+            return file.getHash();
+        content = getContent(file.getFilePath());
+        String hashed = hash(content);
+        File blob = new File("git/objects", hashed);
+        if (!blob.exists()) {
+            blob.createNewFile();
+            FileWriter writer = new FileWriter(blob);
+            writer.write(content);
+            writer.close();
+        }
+        return hashed;
     }
 
     public static void createTestFiles() throws IOException {
@@ -194,17 +228,21 @@ public class Git {
         System.out.println("blob doesnt exist lol");
     }
     
-    public static String createTree(ArrayList<IndexEntry> files) {
+    public static String createTree(ArrayList<IndexEntry> files) throws NoSuchAlgorithmException, IOException {
         StringBuilder treeContents = new StringBuilder("");
         for (IndexEntry file : files) {
-            treeContents.append("BLOB " + file.getHash() + " " + file.getFilePath());
+            String hash = BLOBFile(file);
+            treeContents.append("BLOB " + hash + " " + file.getFilePath() + "\n");
         }
+        String treeFileContents = treeContents.substring(0, treeContents.length() - 1);
         try {
-            File tree = new File(hash(treeContents.toString()));
+            String treeHash = hash(treeFileContents);
+            File tree = new File("git/objects/" + treeHash);
             tree.createNewFile();
             FileWriter writer = new FileWriter(tree);
-            writer.write(treeContents.toString());
-            return hash(treeContents.toString());
+            writer.write(treeFileContents);
+            writer.close();
+            return treeHash;
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -213,7 +251,7 @@ public class Git {
         return "";
     }
 
-    public static void createWorkingList() {
+    public static void buildTree() throws NoSuchAlgorithmException, IOException {
         PriorityQueue<IndexEntry> workingList = new PriorityQueue<IndexEntry>();
         try (BufferedReader br = new BufferedReader(new FileReader("git/index"))) {
             String line;
@@ -224,28 +262,28 @@ public class Git {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // FIX ENTRY
-
+        
         ArrayList<IndexEntry> currTreeItems = new ArrayList<>();
-        IndexEntry currItem = workingList.remove();
+        IndexEntry currItem = workingList.peek();
         String currFolder = currItem.getFolderPath();
         String currTree = currFolder;
 
         while (!workingList.isEmpty()) {
-            if (currFolder.equals("")) {
-                // normal blob it
-            } else if (currFolder.equals(currTree)) {
-                currTreeItems.add(currItem);
-            }
-            else {
-                String treeHash = createTree(currTreeItems);
-                workingList.add(new IndexEntry(treeHash, currFolder));
-                currTreeItems.clear();
-                currTreeItems.add(currItem);
-                currTree = currFolder;
-            }
             currItem = workingList.remove();
             currFolder = currItem.getFolderPath();
+            if (currFolder.equals("")) {
+                String hash = BLOBFile(currItem);
+            } else if (currFolder.equals(currTree)) {
+                currTreeItems.add(currItem);
+
+                if (workingList.isEmpty() || !workingList.peek().getFolderPath().equals(currTree)) {
+                    String treeHash = createTree(currTreeItems);
+                    workingList.add(new IndexEntry(treeHash, currFolder));
+                    currTreeItems.clear();
+                    currTreeItems.add(currItem);
+                    currTree = currFolder;
+                }
+            }
         }
 
     }
