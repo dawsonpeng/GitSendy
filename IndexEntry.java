@@ -39,11 +39,7 @@ public class IndexEntry implements Comparable<IndexEntry> {
         String[] brokenDownPathA = filePath.split("/");
         String[] brokenDownPathB = otherIndexEntry.filePath.split("/");
         if (brokenDownPathA.length != brokenDownPathB.length)
-            return Integer.compare(brokenDownPathA.length - 1, brokenDownPathB.length - 1);
-        for (int i = 0; i < brokenDownPathA.length; i++) {
-            if (!brokenDownPathA[i].equals(brokenDownPathB[i]))
-                return brokenDownPathA[i].compareTo(brokenDownPathB[i]);
-        }
-        return 0;
+            return Integer.compare(brokenDownPathB.length - 1, brokenDownPathA.length - 1);
+        return filePath.compareTo(otherIndexEntry.filePath);
     }
 }

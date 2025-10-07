@@ -18,11 +18,12 @@ public class Tester {
         // Git.checkBlobExists("testFiles/f3.txt");
 
         // ADD FILES TO INDEX
-        Git.addIndex("testFiles/f1.txt");
+        Git.addIndex("f0.txt");
+        Git.addIndex("f1.txt");
         Git.addIndex("testFiles/f2.txt");
         Git.addIndex("testFiles/f3.txt");
-        Git.addIndex("testFiles/f4.txt");
-        Git.addIndex("testFiles/f5.txt");
+        Git.addIndex("testFiles/testFiles2/f4.txt");
+        Git.addIndex("testFiles/testFiles2/f5.txt");
 
         Git.buildTree();
     }

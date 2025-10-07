@@ -179,16 +179,23 @@ public class Git {
     public static void createTestFiles() throws IOException {
         File testFolder = new File("testFiles");
         testFolder.mkdir();
-        File f1 = new File("testFiles/f1.txt");
+        File testFolder2 = new File("testFiles/testFiles2");
+        testFolder2.mkdir();
+        File f0 = new File("f0.txt");
+        File f1 = new File("f1.txt");
         File f2 = new File("testFiles/f2.txt");
         File f3 = new File("testFiles/f3.txt");
-        File f4 = new File("testFiles/f4.txt");
-        File f5 = new File("testFiles/f5.txt");
+        File f4 = new File("testFiles/testFiles2/f4.txt");
+        File f5 = new File("testFiles/testFiles2/f5.txt");
+        f0.createNewFile();
         f1.createNewFile();
         f2.createNewFile();
         f3.createNewFile();
         f4.createNewFile();
         f5.createNewFile();
+        FileWriter writer0 = new FileWriter(f0);
+        writer0.write("._.");
+        writer0.close();
         FileWriter writer1 = new FileWriter(f1);
         writer1.write("67");
         writer1.close();
@@ -262,27 +269,27 @@ public class Git {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         ArrayList<IndexEntry> currTreeItems = new ArrayList<>();
-        IndexEntry currItem = workingList.peek();
-        String currFolder = currItem.getFolderPath();
-        String currTree = currFolder;
 
         while (!workingList.isEmpty()) {
-            currItem = workingList.remove();
-            currFolder = currItem.getFolderPath();
-            if (currFolder.equals("")) {
-                String hash = BLOBFile(currItem);
-            } else if (currFolder.equals(currTree)) {
-                currTreeItems.add(currItem);
+            IndexEntry currItem = workingList.remove();
+            String currFolder = currItem.getFolderPath();
 
-                if (workingList.isEmpty() || !workingList.peek().getFolderPath().equals(currTree)) {
-                    String treeHash = createTree(currTreeItems);
-                    workingList.add(new IndexEntry(treeHash, currFolder));
-                    currTreeItems.clear();
-                    currTreeItems.add(currItem);
-                    currTree = currFolder;
-                }
+            if (currFolder.equals("")) {
+                BLOBFile(currItem);
+            }
+
+            currTreeItems.add(currItem);
+
+            if (workingList.isEmpty() || !workingList.peek().getFolderPath().equals(currFolder)) {
+                String treeHash = createTree(currTreeItems);
+
+                String parentFolder = currItem.getFolderPath();
+                if (!parentFolder.equals(""))
+                    workingList.add(new IndexEntry(treeHash, parentFolder));
+
+                currTreeItems.clear();
             }
         }
 
