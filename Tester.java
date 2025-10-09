@@ -25,6 +25,6 @@ public class Tester {
         Git.addIndex("testFiles/testFiles2/f4.txt");
         Git.addIndex("testFiles/testFiles2/f5.txt");
 
-        Git.buildTree();
+        System.out.println(Git.buildTree());
     }
 }

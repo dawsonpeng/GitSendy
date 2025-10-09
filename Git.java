@@ -261,7 +261,7 @@ public class Git {
         return "";
     }
 
-    public static void buildTree() throws NoSuchAlgorithmException, IOException {
+    public static String buildTree() throws NoSuchAlgorithmException, IOException {
         PriorityQueue<IndexEntry> workingList = new PriorityQueue<IndexEntry>();
         try (BufferedReader br = new BufferedReader(new FileReader("git/index"))) {
             String line;
@@ -271,9 +271,11 @@ public class Git {
 
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
 
         ArrayList<IndexEntry> currTreeItems = new ArrayList<>();
+        String rootTree = null;
 
         while (!workingList.isEmpty()) {
             IndexEntry currItem = workingList.remove();
@@ -286,6 +288,7 @@ public class Git {
 
             if (workingList.isEmpty() || !workingList.peek().getFolderPath().equals(currFolder)) {
                 String treeHash = createTree(currTreeItems);
+                rootTree = treeHash;
 
                 String parentFolder = currItem.getFolderPath();
                 if (!parentFolder.equals(""))
@@ -294,6 +297,6 @@ public class Git {
                 currTreeItems.clear();
             }
         }
-
+        return rootTree;
     }
 }
