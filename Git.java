@@ -11,6 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -298,5 +300,32 @@ public class Git {
             }
         }
         return rootTree;
+    }
+
+    public static String commit(String author, String message) {
+        try {
+            // Read the parent commit from HEAD
+            BufferedReader HEADReader = new BufferedReader(new FileReader("git/HEAD"));
+            String HEADString = HEADReader.readLine();
+            HEADReader.close();
+            // Let's figure out what we're writing into the commit file
+            String commitFileText = "tree: " + buildTree() + 
+            ((HEADString == null) ? ("") : ("\nparent: " + HEADString)) + // If there was nothing in HEAD, don't write anything here -- otherwise, write the hash
+            "\nauthor: " + author + 
+            "\ndate: " + LocalDateTime.now() + 
+            "\nmessage: " + message;
+            String commitHash = hash(commitFileText);
+            File commitFile = new File("git/objects/" + commitHash);
+            FileWriter commitFileWriter = new FileWriter(commitFile);
+            commitFileWriter.write(commitFileText);
+            commitFileWriter.close();
+            FileWriter HEADFileWriter = new FileWriter("git/HEAD");
+            HEADFileWriter.write(commitHash);
+            HEADFileWriter.close();
+            return commitHash;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
