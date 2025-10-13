@@ -1,3 +1,4 @@
+import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
@@ -25,6 +26,14 @@ public class Tester {
         Git.addIndex("testFiles/testFiles2/f4.txt");
         Git.addIndex("testFiles/testFiles2/f5.txt");
 
-        Git.buildTree();
+        System.out.println(Git.commit("McChezzy51", "I am the walrus"));
+
+        FileWriter fw = new FileWriter("Meditations.txt");
+        fw.write("Koo koo ku-chu koo koo ku-chu");
+        fw.close();
+
+        Git.addIndex("Meditations.txt");
+
+        System.out.println(Git.commit("McChezzy51", "I am the eggman"));
     }
 }
