@@ -11,11 +11,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import javax.annotation.processing.FilerException;
 
 public class Git {
     static boolean compression = false;
@@ -261,7 +265,7 @@ public class Git {
         return "";
     }
 
-    public static void buildTree() throws NoSuchAlgorithmException, IOException {
+    public static String buildTree() throws NoSuchAlgorithmException, IOException {
         PriorityQueue<IndexEntry> workingList = new PriorityQueue<IndexEntry>();
         try (BufferedReader br = new BufferedReader(new FileReader("git/index"))) {
             String line;
@@ -271,9 +275,11 @@ public class Git {
 
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
 
         ArrayList<IndexEntry> currTreeItems = new ArrayList<>();
+        String rootTree = null;
 
         while (!workingList.isEmpty()) {
             IndexEntry currItem = workingList.remove();
@@ -286,6 +292,7 @@ public class Git {
 
             if (workingList.isEmpty() || !workingList.peek().getFolderPath().equals(currFolder)) {
                 String treeHash = createTree(currTreeItems);
+                rootTree = treeHash;
 
                 String parentFolder = currItem.getFolderPath();
                 if (!parentFolder.equals(""))
@@ -294,6 +301,62 @@ public class Git {
                 currTreeItems.clear();
             }
         }
+        return rootTree;
+    }
 
+    public static String commit(String author, String message) {
+        try {
+            // Read the parent commit from HEAD
+            BufferedReader HEADReader = new BufferedReader(new FileReader("git/HEAD"));
+            String HEADString = HEADReader.readLine();
+            HEADReader.close();
+            // Let's figure out what we're writing into the commit file
+            String commitFileText = "tree: " + buildTree() + 
+            ((HEADString == null) ? ("") : ("\nparent: " + HEADString)) + // If there was nothing in HEAD, don't write anything here -- otherwise, write the hash
+            "\nauthor: " + author + 
+            "\ndate: " + LocalDateTime.now() + 
+            "\nmessage: " + message;
+            String commitHash = hash(commitFileText);
+            File commitFile = new File("git/objects/" + commitHash);
+            FileWriter commitFileWriter = new FileWriter(commitFile);
+            commitFileWriter.write(commitFileText);
+            commitFileWriter.close();
+            FileWriter HEADFileWriter = new FileWriter("git/HEAD");
+            HEADFileWriter.write(commitHash);
+            HEADFileWriter.close();
+            return commitHash;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Recursively returns the tree specified by the given hash to the working directory
+    public static void checkoutTree(String tree) {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("git/objects/" + tree));
+            while (br.ready()) {
+                String line = br.readLine();
+                String[] lineParts = line.split(" ");
+                String fileType = lineParts[0];
+                String fileHash = lineParts[1];
+                String fileName = lineParts[2];
+                if (fileType.equals("tree")) {
+                    File curTree = new File(fileName);
+                    if (!curTree.exists() || (curTree.exists() && curTree.isFile())) {
+                        curTree.mkdir();
+                    }
+                    checkoutTree(fileHash);
+                } else if (fileType.equals("blob")) {
+                    byte[] fileContents = Files.readAllBytes(Paths.get("git/objects/" + fileHash));
+                    Files.write(Paths.get(fileName), fileContents);
+                }
+            }
+            br.close();
+        } catch (Exception e) {
+            System.out.println("Could not read tree " + tree);
+            e.printStackTrace();
+            return;
+        }
     }
 }
