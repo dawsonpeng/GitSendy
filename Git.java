@@ -19,6 +19,8 @@ import java.util.PriorityQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.annotation.processing.FilerException;
+
 public class Git {
     static boolean compression = false;
 
@@ -326,6 +328,35 @@ public class Git {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    // Recursively returns the tree specified by the given hash to the working directory
+    public static void checkoutTree(String tree) {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("git/objects/" + tree));
+            while (br.ready()) {
+                String line = br.readLine();
+                String[] lineParts = line.split(" ");
+                String fileType = lineParts[0];
+                String fileHash = lineParts[1];
+                String fileName = lineParts[2];
+                if (fileType.equals("tree")) {
+                    File curTree = new File(fileName);
+                    if (!curTree.exists() || (curTree.exists() && curTree.isFile())) {
+                        curTree.mkdir();
+                    }
+                    checkoutTree(fileHash);
+                } else if (fileType.equals("blob")) {
+                    byte[] fileContents = Files.readAllBytes(Paths.get("git/objects/" + fileHash));
+                    Files.write(Paths.get(fileName), fileContents);
+                }
+            }
+            br.close();
+        } catch (Exception e) {
+            System.out.println("Could not read tree " + tree);
+            e.printStackTrace();
+            return;
         }
     }
 }

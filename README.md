@@ -39,4 +39,8 @@ createTree(ArrayList<IndexEntry> files) -> builds a tree from all the index entr
 
 buildTree() -> accesses index file and converts lines to priority queue of index entries. loops through, when the end of a subfolder is reached it builds that mini tree and then adds it to the working list, loops through until there are no more subfolders (you are at the root)
 
+Commit functionality:
+
+What bugs did you discover, and which ones did you fix? What functionality was missing? Did you implement any missing functionality?
+I added some extra logic to return the hash of the root tree so a commit could be made.
 

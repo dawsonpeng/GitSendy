@@ -1,3 +1,8 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.nio.file.Paths;
+
 public class GitWrapper {
 
     /**
@@ -64,7 +69,18 @@ public class GitWrapper {
      * @param commitHash The SHA1 hash of the commit to check out.
      */
     public void checkout(String commitHash) {
-        // to-do: implement functionality here
-
+        String treeHash = null;
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("git/objects/" + commitHash));
+            String firstLine = br.readLine();
+            br.close();
+            String[] parts = firstLine.split(" ");
+            treeHash = parts[1];
+        } catch (Exception e) {
+            System.out.println("Could not read specified commit!");
+            e.printStackTrace();
+            return;
+        }
+        Git.checkoutTree(treeHash);
     };
 }
